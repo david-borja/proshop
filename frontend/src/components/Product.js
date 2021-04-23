@@ -26,8 +26,4 @@ const Product = ({ product }) => {
   );
 };
 
-Rating.defaultProps = {
-  color: "#f8e825",
-};
-
 export default Product;
