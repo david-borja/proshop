@@ -29,7 +29,10 @@ router.get(
     if (product) {
       res.json(product);
     } else {
-      res.status(404).json({ message: "Product not found" });
+      // Now that we have a custom errorHandler, we can change the line below
+      // res.status(404).json({ message: "Product not found" });
+      res.status(404); // if we remove this, by default will throw a 500
+      throw new Error("Product not found");
     }
   })
 );
