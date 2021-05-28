@@ -2,6 +2,8 @@ import React from "react";
 import PropTypes from "prop-types"; // with the react extension: impt
 
 const Rating = ({ value, text, color }) => {
+  // console.log("rating value: ", value);
+  // console.log("rating text: ", text);
   return (
     <div className="rating">
       <span>
@@ -71,6 +73,8 @@ const Rating = ({ value, text, color }) => {
 
 Rating.defaultProps = {
   color: "#f8e825",
+  // We have value marked as required, but at mount time we have still not fetched it, so we can provide a default as a possible solution
+  // value: 0,
 };
 
 Rating.propTypes = {

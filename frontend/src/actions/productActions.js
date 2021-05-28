@@ -9,6 +9,9 @@ import {
   PRODUCT_LIST_REQUEST,
   PRODUCT_LIST_SUCCESS,
   PRODUCT_LIST_FAIL,
+  PRODUCT_DETAILS_REQUEST,
+  PRODUCT_DETAILS_SUCCESS,
+  PRODUCT_DETAILS_FAIL,
 } from "../constants/productConstants";
 
 // What this ACTION CREATOR is gonna do what we did in our useEffect in the homescreen. Here we want to make an asynchronous request, so here is where Redux thunk comes in. What Redux thunk allows us to do is to add a function within a function. Here in this graph seems that it has to be done the CROWN CLOTHING way: https://redux.js.org/tutorials/essentials/part-5-async-logic
@@ -22,6 +25,25 @@ export const listProducts = () => async (dispatch) => {
     // error.response gives the generic message, but if we have a custom error we also wanna check error.response.data.message
     dispatch({
       type: PRODUCT_LIST_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    });
+  }
+};
+
+export const listProductDetails = (productId) => async (dispatch) => {
+  try {
+    // When we dispatch a request, automatically it sets loading to true (see productReducers)
+    dispatch({ type: PRODUCT_DETAILS_REQUEST });
+    // const data = await JSON.parse(res); DON'T NEED THIS IF WE USE AXIOS!
+    const { data } = await axios.get(`/api/products/${productId}`);
+    dispatch({ type: PRODUCT_DETAILS_SUCCESS, payload: data });
+  } catch (error) {
+    // error.response gives the generic message, but if we have a custom error we also wanna check error.response.data.message
+    dispatch({
+      type: PRODUCT_DETAILS_FAIL,
       payload:
         error.response && error.response.data.message
           ? error.response.data.message

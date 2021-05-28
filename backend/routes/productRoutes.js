@@ -12,6 +12,11 @@ router.get(
     // We use the Product model, and we are gonna get all the products because we are passing an empty object. This returns a promise because we use a mongoose method
     const products = await Product.find({});
     // Displays the raw json on the browser
+
+    // This way we can force an error:
+    // res.status(401);
+    // throw new Error("Not Authorized");
+
     res.json(products);
   })
 );
