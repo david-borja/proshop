@@ -7,13 +7,19 @@ import {
   productDetailsReducer,
 } from "./reducers/productReducers";
 
+import { cartReducer } from "./reducers/cartReducers";
 // The productList key is very important, because it is what's gonna show as a part of the state
 const reducer = combineReducers({
   productList: productListReducer,
   productDetails: productDetailsReducer,
+  cart: cartReducer,
 });
 
-const initialState = {};
+const cartItemsFromStorage = localStorage.getItem("cartItems")
+  ? JSON.parse(localStorage.getItem("cartItems"))
+  : [];
+
+const initialState = { cart: { cartItems: cartItemsFromStorage } };
 
 const middleware = [thunk];
 
