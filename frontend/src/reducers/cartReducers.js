@@ -31,8 +31,11 @@ export const cartReducer = (state = { cartItems: [] }, action) => {
           ),
           // This is the way I'd have done it (it increases the qty)
           // cartItems: state.cartItems.map((x) =>
-          //   x.product === existItem.product ? { ...item, qty: x.qty + item.qty } : x
-          // ),
+          //   x.product === existItem.product
+          //     ? { ...x, qty: x.qty + item.qty }
+          //     : x
+          // ), -> It seems it makes sense to overwrite the items.qty. Because this function is gonna trigger every time we hit the cart route with a productId. So if the user refreshes the page after adding an item with quantity 2, it will be quantity 4 after the refresh.
+          // With the above solution, we avoid this problem.
         };
       } else {
         return { ...state, cartItems: [...state.cartItems, item] };

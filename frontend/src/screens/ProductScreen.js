@@ -16,7 +16,8 @@ import Loader from "../components/Loader";
 import { listProductDetails } from "../actions/productActions";
 
 const ProductScreen = ({ history, match }) => {
-  const [qty, setQty] = useState(0);
+  // Previously we had set qty to 0 here, which makes NO SENSE. Obviously, when the user adds an item to the cart, he wants to add it with a quantity of 1 (at least).
+  const [qty, setQty] = useState(1);
   const dispatch = useDispatch();
   const productDetails = useSelector((state) => state.productDetails);
 
