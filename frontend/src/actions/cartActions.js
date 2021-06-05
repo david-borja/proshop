@@ -6,6 +6,7 @@ import {
   // ADD_TO_CART_SUCCESS,
   // ADD_TO_CART_FAIL,
   CART_ADD_ITEM,
+  CART_REMOVE_ITEM,
 } from "../constants/cartConstants";
 
 // Here is my first try
@@ -51,5 +52,14 @@ export const addToCart = (productId, qty) => async (dispatch, getState) => {
     },
   });
   // We save it to localStorage, but where do we get it? -> in our store
+  localStorage.setItem("cartItems", JSON.stringify(getState().cart.cartItems));
+};
+
+export const removeFromCart = (id) => (dispatch, getState) => {
+  dispatch({
+    type: CART_REMOVE_ITEM,
+    payload: id,
+  });
+
   localStorage.setItem("cartItems", JSON.stringify(getState().cart.cartItems));
 };
