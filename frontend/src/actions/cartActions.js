@@ -37,6 +37,8 @@ export const addToCart = (productId, qty) => async (dispatch, getState) => {
   // Also, we are first doing the axios request and then dispatching the action, as opposed to the productActions, where we first dispatch the REQUEST action.
 
   const { data } = await axios.get(`/api/products/${productId}`);
+
+  // Our dbs data is available at this route, and we assign it to the action payload
   dispatch({
     type: CART_ADD_ITEM,
     payload: {

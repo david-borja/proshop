@@ -6,6 +6,16 @@ h3 {
   padding: 1rem 0;
 }
 
+h1 {
+  font-size: 1.8rem;
+  padding: 1rem 0;
+}
+
+h2 {
+  font-size: 1.4rem;
+  padding: 0.5rem 0;
+}
+
 .rating span {
   /* possibly change margin to 0.05 to keep the same layout if there are more than 9 ratings - UPDATE: it seems that might not always solve the problem */
   margin: 0.1rem;

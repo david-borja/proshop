@@ -23,9 +23,8 @@ const CartScreen = ({ match, location, history }) => {
 
   // We want to get our cartItems from Redux and display them on the UI.
   const cart = useSelector((state) => state.cart);
-  const { cartItems } = cart;
 
-  console.log(cartItems);
+  const { cartItems } = cart;
 
   useEffect(() => {
     // We only want to dispatch addToCart if there is a productId. If we just go to the regular cart page, we don't want to dispatch addToCart.
@@ -34,7 +33,108 @@ const CartScreen = ({ match, location, history }) => {
     }
   }, [dispatch, productId, qty]);
 
-  return <div>Cart</div>;
+  const removeFromCartHandler = (productId) => {
+    const filteredCart = cartItems.filter((item) => item.product !== productId);
+    console.log(filteredCart);
+  };
+
+  const checkoutHandler = () => {
+    // here we are redirecting the user -> if they are NOT logged in, they are gonna go to login, and if they are logged in, they'll go to shipping
+    history.push("/login?redirect=shipping");
+  };
+
+  return (
+    <Row>
+      <Col md={8}>
+        <h1>Shopping Cart</h1>
+        {/* We may want to display something different if the array of cartItems is empty. BUT, we always want to prevent the cart itemps from being mapped if its value is undefined. Otherwise, it will break the app */}
+        {typeof cartItems === undefined || cartItems.length === 0 ? (
+          <Message>
+            Your cart is empty <Link to="/">Go Back</Link>
+          </Message>
+        ) : (
+          <ListGroup variant="flush">
+            {cartItems.map((item) => (
+              <ListGroup.Item key={item.product}>
+                <Row>
+                  <Col md={2}>
+                    <Image src={item.image} alt={item.name} fluid rounded />
+                  </Col>
+                  <Col md={3}>
+                    <Link to={`/product/${item.product}`}>{item.name}</Link>
+                  </Col>
+                  <Col md={2}>${item.price}</Col>
+                  <Col md={2}>
+                    {/* This is the form control from ProductScreen, slightly modified */}
+                    <Form.Control
+                      as="select"
+                      // here we have to substitute qty (which state doesn't exist here) for item.qty
+                      // value={qty}
+                      value={item.qty}
+                      // We don't have setQty available, because qty is not available in our component state, so instead we want to dispatch the item again with the quantity newly selected. To make sure it is a number, we wrap it with Number()
+                      // onChange={(e) => setQty(e.target.value)}
+                      onChange={(e) =>
+                        dispatch(
+                          addToCart(item.product, Number(e.target.value))
+                        )
+                      }
+                    >
+                      {/* this creates an array of values up to countInStock */}
+                      {[...Array(item.countInStock).keys()]
+                        .slice(0, 10)
+                        // with slice we can limit the max items the user can order
+                        .map((x) => (
+                          <option key={x + 1} value={x + 1}>
+                            {x + 1}
+                          </option>
+                        ))}
+                    </Form.Control>
+                  </Col>
+                  <Col md={2}>
+                    <Button
+                      type="button"
+                      variant="light"
+                      onClick={() => removeFromCartHandler(item.product)}
+                    >
+                      <i className="fas fa-trash"></i>
+                    </Button>
+                  </Col>
+                </Row>
+              </ListGroup.Item>
+            ))}
+          </ListGroup>
+        )}
+      </Col>
+      <Col md={4}>
+        <Card>
+          <ListGroup variant="flush">
+            <ListGroup.Item>
+              <h2>
+                Subtotal (
+                {cartItems.reduce((acc, curItem) => acc + curItem.qty, 0)})
+                items
+              </h2>
+              $
+              {cartItems
+                .reduce((acc, curItem) => acc + curItem.price * curItem.qty, 0)
+                // we add toFixed(2) to fix the value to two decimal
+                .toFixed(2)}
+            </ListGroup.Item>
+            <ListGroup.Item>
+              <Button
+                type="button"
+                className="btn-block"
+                disabled={cartItems.length === 0}
+                onClick={checkoutHandler}
+              >
+                Proceed To Checkout
+              </Button>
+            </ListGroup.Item>
+          </ListGroup>
+        </Card>
+      </Col>
+    </Row>
+  );
 };
 
 export default CartScreen;
