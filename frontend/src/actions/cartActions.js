@@ -14,7 +14,8 @@ import {
 //   try {
 //     // When we dispatch a request, automatically it sets loading to true
 //     dispatch({ type: ADD_TO_CART_REQUEST });
-//     // const data = await JSON.parse(res); DON'T NEED THIS IF WE USE AXIOS!
+//     // const data = await JSON.parse(res); DON'T NEED THIS IF WE USE AXIOS! -> forget this line, because here we are awaiting, when actually JSON.parse() is synchronous. Also, when we use fetch we want to use json(). -> AJAX works with callbacks, fetch with Promises.
+// Use JSON.parse() to parse the response for AJAX. Use json() to parse the response for fetch.
 //     // DO I NEED TO MAKE AN AXIOS REQUEST TO A ROUTE TO UPDATE CART?? DON'T I HAVE THAT INFO IN THE COMPONENT ALREADY?
 //     // Another doubt: why do we write the question mark either before or after the query string?
 //     const { data } = await axios.get(`/cart/${productId}?/?qty=${qty}`);
