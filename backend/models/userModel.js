@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 
 const userSchema = mongoose.Schema(
   {
@@ -23,6 +24,14 @@ const userSchema = mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// It creates a method that we can use with an instantiated user.
+userSchema.methods.matchPassword = async function (enteredPassword) {
+  // enteredPassword is gonna be a plain text password
+  // The compare method comes from bcryptjs.
+  // Due to calling .matchPassword on an specific user, we can access his/her encrypted password with this.password.
+  return await bcrypt.compare(enteredPassword, this.password);
+};
 
 const User = mongoose.model("User", userSchema);
 
