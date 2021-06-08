@@ -24,6 +24,7 @@ app.get("/", (req, res) => {
 app.use("/api/products", productRoutes);
 // Here we mount the userRoutes
 app.use("/api/users", userRoutes);
+
 // Here we have a fallback for 404 errors (anything that it's not an actual route)
 app.use(notFound);
 // With this error middleware we want to overwrite the default error handler (we write it at the bottom, under the routes)

@@ -1,4 +1,5 @@
 import asyncHandler from "express-async-handler";
+import generateToken from "../utils/generateToken.js";
 import User from "../models/userModel.js";
 
 // @desc Auth user & get token
@@ -24,7 +25,8 @@ const authUser = asyncHandler(async (req, res) => {
       name: user.name,
       email: user.email,
       isAdmin: user.isAdmin,
-      token: null,
+      // GENERATES TOKEN WHEN USER AUTHENTICATES
+      token: generateToken(user._id),
     });
   } else {
     res.status(401);
@@ -32,4 +34,66 @@ const authUser = asyncHandler(async (req, res) => {
   }
 });
 
-export { authUser };
+//////// TOP
+
+// @desc Register a new user
+// @route POST /api/users
+// @access Public
+
+const registerUser = asyncHandler(async (req, res) => {
+  // It also needs name to create a user
+  const { name, email, password } = req.body;
+
+  const userExists = await User.findOne({ email });
+
+  if (userExists) {
+    res.status(400);
+    throw new Error("User already exists");
+  }
+
+  // In this line below, password is unencrypted. Just plain text (It can be encrypted using some Mongoose middleware). Here, even we are using "create", is basically sytactic sugar for the .save method. So, the pre-save middleware will run before the user gets created
+  const user = await User.create({ name, email, password });
+
+  // Checks if everything went ok and the user is created
+  if (user) {
+    // We want to send back the same data we sent from the login.
+    res.status(201).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      isAdmin: user.isAdmin,
+      // We also want to generate a token when the user registers because we want to be able to authenticate it right after the registration
+      token: generateToken(user._id),
+    });
+  } else {
+    res.status(400);
+    throw new Error("Invalid user data");
+  }
+});
+
+//////// BOTTOM
+
+// @desc GET user profile
+// @route GET /api/users/profile
+// @access Private
+const getUserProfile = asyncHandler(async (req, res) => {
+  // res.send("Success");
+
+  // it uses req.user._id to get the loggedin user id -> we can use req.user in any protected route that we want.
+  const user = await User.findById(req.user._id);
+
+  if (user) {
+    // This is the info it returns when a GET request is made with the correct token to get a specific user profile.
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      isAdmin: user.isAdmin,
+    });
+  } else {
+    res.status(404);
+    throw new Error("User not found");
+  }
+});
+
+export { authUser, registerUser, getUserProfile };
