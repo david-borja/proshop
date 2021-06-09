@@ -18,6 +18,7 @@ const App = () => {
           <Route path="/product/:id" component={ProductScreen} />
           {/* By adding the question mark, we make the id optional, because we might want to go to the cart link without any product */}
           <Route path="/cart/:id?" component={CartScreen} />
+          {/* HomeScreen moved from top to here */}
           <Route path="/" component={HomeScreen} exact />
         </Container>
       </main>
