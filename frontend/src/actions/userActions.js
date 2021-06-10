@@ -9,6 +9,9 @@ import {
   USER_LOGOUT,
   USER_REGISTER_FAIL,
   USER_REGISTER_SUCCESS,
+  USER_UPDATE_PROFILE_FAIL,
+  USER_UPDATE_PROFILE_REQUEST,
+  USER_UPDATE_PROFILE_SUCCESS,
 } from "../constants/userConstants";
 
 // This action makes a request to login and gets the token (remember: it is using redux-thunk)
@@ -129,6 +132,45 @@ export const getUserDetails = (id) => async (dispatch, getState) => {
     console.log({ error });
     dispatch({
       type: USER_DETAILS_FAIL,
+      payload:
+        // Basically, the error  we get is gonna be the same in all the actions
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    });
+  }
+};
+
+// It gets passed the state because we need to get the token
+export const updateUserProfile = (user) => async (dispatch, getState) => {
+  try {
+    dispatch({
+      type: USER_UPDATE_PROFILE_REQUEST,
+    });
+
+    // It destructures two levels deep
+    const {
+      userLogin: { userInfo },
+    } = getState();
+
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+
+    // As the second argument we pass the user object, because is the data we want to update with
+    const { data } = await axios.put(`/api/users/profile`, user, config);
+
+    dispatch({
+      type: USER_UPDATE_PROFILE_SUCCESS,
+      payload: data,
+    });
+  } catch (error) {
+    console.log({ error });
+    dispatch({
+      type: USER_UPDATE_PROFILE_FAIL,
       payload:
         // Basically, the error  we get is gonna be the same in all the actions
         error.response && error.response.data.message
