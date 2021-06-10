@@ -1,5 +1,8 @@
 import axios from "axios";
 import {
+  USER_DETAILS_FAIL,
+  USER_DETAILS_REQUEST,
+  USER_DETAILS_SUCCESS,
   USER_LOGIN_FAIL,
   USER_LOGIN_REQUEST,
   USER_LOGIN_SUCCESS,
@@ -86,6 +89,46 @@ export const register = (name, email, password) => async (dispatch) => {
     console.log({ error });
     dispatch({
       type: USER_REGISTER_FAIL,
+      payload:
+        // Basically, the error  we get is gonna be the same in all the actions
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    });
+  }
+};
+
+// In theory, here "id" doesn't need to get passed. However, later there'll be an endpoint to a user by the id. We'll pass profile as the id, so when making the request, it will be /profile or it will be /userID. We also need to get the token, so we pass getState in order to get userInfo, where the token is.
+export const getUserDetails = (id) => async (dispatch, getState) => {
+  try {
+    dispatch({
+      type: USER_DETAILS_REQUEST,
+    });
+
+    // It destructures two levels deep
+    const {
+      userLogin: { userInfo },
+    } = getState();
+
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+    console.log(id);
+
+    // If this action creator hits /api/users/profile, why id === "profile"? -> The id might be "profile", if it's passed from the ProfileScreen. It might make sense to create a separate action, but they are so similar that it could also be done this way.
+    const { data } = await axios.get(`/api/users/${id}`, config);
+
+    dispatch({
+      type: USER_DETAILS_SUCCESS,
+      payload: data,
+    });
+  } catch (error) {
+    console.log({ error });
+    dispatch({
+      type: USER_DETAILS_FAIL,
       payload:
         // Basically, the error  we get is gonna be the same in all the actions
         error.response && error.response.data.message

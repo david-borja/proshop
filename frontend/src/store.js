@@ -8,7 +8,11 @@ import {
 } from "./reducers/productReducers";
 
 import { cartReducer } from "./reducers/cartReducers";
-import { userLoginReducer, userRegisterReducer } from "./reducers/userReducers";
+import {
+  userLoginReducer,
+  userRegisterReducer,
+  userDetailsReducer,
+} from "./reducers/userReducers";
 
 // The productList key is very important, because it is what's gonna show as a part of the state
 const reducer = combineReducers({
@@ -17,6 +21,7 @@ const reducer = combineReducers({
   cart: cartReducer,
   userLogin: userLoginReducer,
   userRegister: userRegisterReducer,
+  userDetails: userDetailsReducer,
 });
 
 const cartItemsFromStorage = localStorage.getItem("cartItems")

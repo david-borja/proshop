@@ -8,6 +8,7 @@ import ProductScreen from "./screens/ProductScreen";
 import CartScreen from "./screens/CartScreen";
 import LoginScreen from "./screens/LoginScreen";
 import RegisterScreen from "./screens/RegisterScreen";
+import ProfileScreen from "./screens/ProfileScreen";
 
 const App = () => {
   return (
@@ -17,6 +18,7 @@ const App = () => {
         <Container>
           <Route path="/login" component={LoginScreen} />
           <Route path="/register" component={RegisterScreen} />
+          <Route path="/profile" component={ProfileScreen} />
           <Route path="/product/:id" component={ProductScreen} />
           {/* By adding the question mark, we make the id optional, because we might want to go to the cart link without any product */}
           <Route path="/cart/:id?" component={CartScreen} />
