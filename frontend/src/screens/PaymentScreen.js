@@ -19,11 +19,7 @@ const PaymentScreen = ({ history }) => {
 
   const sumbitHandler = (e) => {
     e.preventDefault();
-    dispatch(
-      savePaymentMethod({
-        paymentMethod,
-      })
-    );
+    dispatch(savePaymentMethod(paymentMethod));
     // It redirects the user after submitting the form
     history.push("/placeorder");
   };
