@@ -17,6 +17,7 @@ import {
 import {
   orderCreateReducer,
   orderDetailsReducer,
+  orderPayReducer,
 } from "./reducers/orderReducers";
 
 // The productList key is very important, because it is what's gonna show as a part of the state
@@ -30,6 +31,7 @@ const reducer = combineReducers({
   userUpdateProfile: userUpdateProfileReducer,
   orderCreate: orderCreateReducer,
   orderDetails: orderDetailsReducer,
+  orderPay: orderPayReducer,
 });
 
 const cartItemsFromStorage = localStorage.getItem("cartItems")

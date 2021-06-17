@@ -19,7 +19,10 @@ const OrderScreen = ({ match }) => {
     : 0;
 
   useEffect(() => {
+    // Makes sure that the order._id matches the id in the URL. In other words, dispatches getOrderDetails again if the user switches to a different order URL. -> BUT, I'm not sure if we actually need this.
+    //   if (!order || order._id !== orderId) {
     dispatch(getOrderDetails(orderId));
+    //   }
   }, [dispatch, orderId]);
 
   return loading ? (
