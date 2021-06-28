@@ -27,6 +27,11 @@ app.use("/api/products", productRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/orders", orderRoutes);
 
+// When this route is hit, it fetches the PAYPAL_CLIENT_ID from process.env
+app.get("/api/config/paypal", (req, res) =>
+  res.send(process.env.PAYPAL_CLIENT_ID)
+);
+
 // Here we have a fallback for 404 errors (anything that it's not an actual route)
 app.use(notFound);
 // With this error middleware we want to overwrite the default error handler (we write it at the bottom, under the routes)

@@ -1,17 +1,27 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { PayPalButton } from "react-paypal-button-v2";
 import { Link } from "react-router-dom";
 import { Row, Col, ListGroup, Image, Card } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import Message from "../components/Message";
 import Loader from "../components/CheckoutSteps";
-import { getOrderDetails } from "../actions/orderActions";
+import { getOrderDetails, payOrder } from "../actions/orderActions";
+import { ORDER_PAY_RESET } from "../constants/orderConstants";
 
 const OrderScreen = ({ match }) => {
   const orderId = match.params.id;
+
+  const [sdkReady, setSdkReady] = useState(false);
+
   const dispatch = useDispatch();
 
   const orderDetails = useSelector((state) => state.orderDetails);
   const { order, loading, error } = orderDetails;
+
+  const orderPay = useSelector((state) => state.orderPay);
+  // This way we are renaming loading and success
+  const { loading: loadingPay, success: successPay } = orderPay;
 
   // It calculates itemsPrice since is not stored in orderDetails
   const itemsPrice = order
@@ -19,11 +29,42 @@ const OrderScreen = ({ match }) => {
     : 0;
 
   useEffect(() => {
+    const addPayPalScript = async () => {
+      const { data: clientId } = await axios.get("/api/config/paypal");
+      const script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}`;
+      console.log({ clientId });
+      script.async = true;
+      script.onload = () => {
+        setSdkReady(true);
+      };
+      document.body.appendChild(script);
+    };
+
+    // It dispatches the action if the order is not there, or if successPay is true
+    if (!order || successPay) {
+      // Notice that this dispatches an action, without using an action creator. However, it is better to keep everything in an action file. If we don't do this reset, once we pay, it's gonna keep refreshing
+      dispatch({ type: ORDER_PAY_RESET });
+      dispatch(getOrderDetails(orderId));
+    } else if (!order.isPaid) {
+      if (!window.paypal) {
+        addPayPalScript();
+      } else {
+        setSdkReady(true);
+      }
+    }
+
     // Makes sure that the order._id matches the id in the URL. In other words, dispatches getOrderDetails again if the user switches to a different order URL. -> BUT, I'm not sure if we actually need this.
     //   if (!order || order._id !== orderId) {
-    dispatch(getOrderDetails(orderId));
+
     //   }
-  }, [dispatch, orderId]);
+  }, [dispatch, orderId, successPay, order]);
+
+  const successPaymentHandler = (paymentResult) => {
+    console.log(paymentResult);
+    dispatch(payOrder(orderId, paymentResult));
+  };
 
   return loading ? (
     <Loader />
@@ -129,6 +170,19 @@ const OrderScreen = ({ match }) => {
                   <Col>${order.totalPrice.toFixed(2)}</Col>
                 </Row>
               </ListGroup.Item>
+              {!order.isPaid && (
+                <ListGroup.Item>
+                  {loadingPay && <Loader />}
+                  {!sdkReady ? (
+                    <Loader />
+                  ) : (
+                    <PayPalButton
+                      amount={order.totalPrice.toFixed(2)}
+                      onSuccess={successPaymentHandler}
+                    />
+                  )}
+                </ListGroup.Item>
+              )}
             </ListGroup>
           </Card>
         </Col>
