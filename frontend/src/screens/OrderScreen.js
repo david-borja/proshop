@@ -44,7 +44,7 @@ const OrderScreen = ({ match }) => {
 
     // It dispatches the action if the order is not there, or if successPay is true
     if (!order || successPay) {
-      // Notice that this dispatches an action, without using an action creator. However, it is better to keep everything in an action file. If we don't do this reset, once we pay, it's gonna keep refreshing
+      // Notice that this dispatches an action, without using an action creator. However, it is better to keep everything in an action file. If we don't do this reset (sets the orderPay state to {}, so the successPay property disappears), once we pay, it's gonna keep refreshing
       dispatch({ type: ORDER_PAY_RESET });
       dispatch(getOrderDetails(orderId));
     } else if (!order.isPaid) {
