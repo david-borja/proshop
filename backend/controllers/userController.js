@@ -143,6 +143,46 @@ const deleteUser = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc   GET user by ID
+// @route  GET /api/users/:id
+// @access Private/Admin
+const getUserById = asyncHandler(async (req, res) => {
+  // it selects the user and returns it without the password
+  const user = await User.findById(req.params.id).select("-password");
+  if (user) {
+    res.json(user);
+  } else {
+    res.status(404);
+    throw new Error("");
+  }
+});
+
+// @desc   Update user
+// @route  PUT /api/users/:id
+// @access Private/Admin
+const updateUser = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id);
+
+  if (user) {
+    user.name = req.body.name || user.name;
+    user.email = req.body.email || user.email;
+    // Nullish coalescing operator "??" -> returns its right-hand side operand when its left-hand side operand is null or undefined, and otherwise returns its left-hand side operand.
+    user.isAdmin = req.body.isAdmin ?? user.isAdmin;
+
+    const updatedUser = await user.save();
+
+    res.json({
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      isAdmin: updatedUser.isAdmin,
+    });
+  } else {
+    res.status(404);
+    throw new Error("User not found");
+  }
+});
+
 export {
   authUser,
   registerUser,
@@ -150,4 +190,6 @@ export {
   updateUserProfile,
   getUsers,
   deleteUser,
+  getUserById,
+  updateUser,
 };
