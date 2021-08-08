@@ -179,6 +179,14 @@ export const updateUserProfile = (user) => async (dispatch, getState) => {
       type: USER_UPDATE_PROFILE_SUCCESS,
       payload: data,
     });
+
+    // After updating it dispatches the login, so the updated user name is displayed on the navbar
+    dispatch({
+      type: USER_LOGIN_SUCCESS,
+      payload: data,
+    });
+
+    localStorage.setItem("userInfo", JSON.stringify(data));
   } catch (error) {
     console.log({ error });
     dispatch({

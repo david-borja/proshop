@@ -6,6 +6,7 @@ import Message from "../components/Message";
 import Loader from "../components/Loader";
 import { getUserDetails, updateUserProfile } from "../actions/userActions";
 import { listMyOrders } from "../actions/orderActions";
+import { USER_UPDATE_PROFILE_RESET } from "../constants/userConstants";
 
 const ProfileScreen = ({ location, history }) => {
   const [name, setName] = useState("");
@@ -13,6 +14,7 @@ const ProfileScreen = ({ location, history }) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState(null);
+  const [profileUpdated, setProfileUpdated] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -30,30 +32,45 @@ const ProfileScreen = ({ location, history }) => {
   const { loading: loadingOrders, error: errorOrders, orders } = orderMyList;
 
   useEffect(() => {
-    // It checks if there is a user logged in. Otherwise it redirects to /login
     if (!userInfo) {
       history.push("/login");
-    } else {
-      if (!user.name) {
-        // getUserDetails gets in an "id", but in this case we are passing "profile".
-        dispatch(getUserDetails("profile"));
-        dispatch(listMyOrders());
-      } else {
-        // If we have name and email in the object of userDetails from Redux store, set the component level states to those values.
-        setName(user.name);
-        setEmail(user.email);
-      }
+      return;
     }
-  }, [dispatch, history, userInfo, user]);
+
+    if (!user || !user.name) {
+      // getUserDetails gets in an "id", but in this case we are passing "profile".
+      dispatch(getUserDetails("profile"));
+      dispatch(listMyOrders());
+      return;
+    }
+
+    if (success) {
+      // We want to reset the updateUserProfile state
+      dispatch({ type: USER_UPDATE_PROFILE_RESET });
+      dispatch(getUserDetails("profile"));
+      setProfileUpdated(true);
+      return;
+    }
+
+    // If we have name and email in the object of userDetails from Redux store, set the component level states to those values.
+    setName(user.name);
+    setEmail(user.email);
+  }, [dispatch, history, userInfo, user, success]);
 
   const submitHandler = (e) => {
     // We don't want the form submission to refresh the page.
     e.preventDefault();
+
+    // get rid off previous messages
+    setProfileUpdated(false);
+    setMessage(null);
+
     if (password !== confirmPassword) {
       setMessage("Passwords do not match");
     } else {
       // DISPATCH UPDATE PROFILE
-      dispatch(updateUserProfile({ id: user._id, name, email, password }));
+      dispatch(updateUserProfile({ name, email, password }));
+      // dispatch(updateUserProfile({ id: user._id, name, email, password }));
     }
   };
 
@@ -64,7 +81,9 @@ const ProfileScreen = ({ location, history }) => {
         {/* error and loading are pieces of state coming from the Redux store */}
         {message && <Message variant="danger">{message}</Message>}
         {error && <Message variant="danger">{error}</Message>}
-        {success && <Message variant="success">Profile Updated!</Message>}
+        {profileUpdated && (
+          <Message variant="success">Profile Updated!</Message>
+        )}
         {loading && <Loader />}
         <Form onSubmit={submitHandler}>
           {/* controlId attribute comes from react-bootstrap */}
