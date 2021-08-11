@@ -17,8 +17,8 @@ const getProducts = asyncHandler(async (req, res) => {
   res.json(products);
 });
 
-// @desc Fetch single product
-// @route GET /api/products/:id
+// @desc   Fetch single product
+// @route  GET /api/products/:id
 // @access Public
 const getProductById = asyncHandler(async (req, res) => {
   // This next line was written when this route was in the server.js. Now, it has to be substituted
@@ -35,4 +35,19 @@ const getProductById = asyncHandler(async (req, res) => {
   }
 });
 
-export { getProducts, getProductById };
+// @desc   Delete a product
+// @route  DELETE /api/products/:id
+// @access Private/Admin
+const deleteProduct = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id); // req.params.id will give us whatever id is in the url
+
+  if (product) {
+    await product.remove();
+    res.json({ message: "Product removed" });
+  } else {
+    res.status(404); // if we remove this, by default will throw a 500
+    throw new Error("Product not found");
+  }
+});
+
+export { getProducts, getProductById, deleteProduct };
