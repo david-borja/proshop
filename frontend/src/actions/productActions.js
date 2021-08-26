@@ -15,6 +15,9 @@ import {
   PRODUCT_DELETE_REQUEST,
   PRODUCT_DELETE_SUCCESS,
   PRODUCT_DELETE_FAIL,
+  PRODUCT_CREATE_REQUEST,
+  PRODUCT_CREATE_FAIL,
+  PRODUCT_CREATE_SUCCESS,
 } from "../constants/productConstants";
 
 // What this ACTION CREATOR is gonna do what we did in our useEffect in the homescreen. Here we want to make an asynchronous request, so here is where Redux thunk comes in. What Redux thunk allows us to do is to add a function within a function. Here in this graph seems that it has to be done the CROWN CLOTHING way: https://redux.js.org/tutorials/essentials/part-5-async-logic
@@ -81,6 +84,43 @@ export const deleteProduct = (id) => async (dispatch, getState) => {
     console.log({ error });
     dispatch({
       type: PRODUCT_DELETE_FAIL,
+      payload:
+        // Basically, the error  we get is gonna be the same in all the actions
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    });
+  }
+};
+
+export const createProduct = () => async (dispatch, getState) => {
+  try {
+    dispatch({
+      type: PRODUCT_CREATE_REQUEST,
+    });
+
+    // It destructures two levels deep
+    const {
+      userLogin: { userInfo },
+    } = getState();
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+
+    // We are making a post request, but we are not sending any data
+    const { data } = await axios.post(`/api/products`, {}, config);
+
+    dispatch({
+      type: PRODUCT_CREATE_SUCCESS,
+      payload: data,
+    });
+  } catch (error) {
+    console.log({ error });
+    dispatch({
+      type: PRODUCT_CREATE_FAIL,
       payload:
         // Basically, the error  we get is gonna be the same in all the actions
         error.response && error.response.data.message
