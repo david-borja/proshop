@@ -1,0 +1,4 @@
+Add to git repo
+// This folder is not gonna be accessible by default. We need to make it a static folder so it can get loaded in the browser.
+
+
