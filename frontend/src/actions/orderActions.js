@@ -15,6 +15,9 @@ import {
   ORDER_LIST_SUCCESS,
   ORDER_LIST_FAIL,
   ORDER_LIST_REQUEST,
+  ORDER_DELIVER_SUCCESS,
+  ORDER_DELIVER_FAIL,
+  ORDER_DELIVER_REQUEST,
 } from "../constants/orderConstants";
 
 export const createOrder = (order) => async (dispatch, getState) => {
@@ -140,6 +143,46 @@ export const payOrder =
       });
     }
   };
+
+export const deliverOrder = (order) => async (dispatch, getState) => {
+  try {
+    dispatch({
+      type: ORDER_DELIVER_REQUEST,
+    });
+
+    // It destructures two levels deep
+    const {
+      userLogin: { userInfo },
+    } = getState();
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+
+    const { data } = await axios.put(
+      `/api/orders/${order._id}/deliver`,
+      {},
+      config
+    );
+
+    dispatch({
+      type: ORDER_DELIVER_SUCCESS,
+      payload: data,
+    });
+  } catch (error) {
+    console.log({ error });
+    dispatch({
+      type: ORDER_DELIVER_FAIL,
+      payload:
+        // Basically, the error  we get is gonna be the same in all the actions
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    });
+  }
+};
 
 export const listMyOrders = () => async (dispatch, getState) => {
   try {
